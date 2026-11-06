@@ -1,7 +1,7 @@
-import {buildCharacter} from './character.js?v=11a';
-import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=11a';
-import * as THREE from './vendor/three.module.min.js?v=11a';
-import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=11a';
+import {buildCharacter} from './character.js?v=12a';
+import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=12a';
+import * as THREE from './vendor/three.module.min.js?v=12a';
+import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=12a';
 const V=p=>new THREE.Vector3(p.x,p.y,p.z), Y=new THREE.Vector3(0,1,0);
 function rng(seed=81){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};}
 export class ClimbScene{
