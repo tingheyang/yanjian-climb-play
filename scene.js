@@ -1,15 +1,15 @@
-import {buildCharacter} from './character.js?v=09a';
-import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=09a';
-import * as THREE from './vendor/three.module.min.js?v=09a';
-import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=09a';
+import {buildCharacter} from './character.js?v=10a';
+import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=10a';
+import * as THREE from './vendor/three.module.min.js?v=10a';
+import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=10a';
 const V=p=>new THREE.Vector3(p.x,p.y,p.z), Y=new THREE.Vector3(0,1,0);
 function rng(seed=81){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};}
 export class ClimbScene{
  constructor(canvas){
- this.canvas=canvas;this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;
+ this.canvas=canvas;this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});this.renderer.setPixelRatio(Math.min(devicePixelRatio,matchMedia("(pointer:coarse)").matches?1.3:1.7));this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;
  this.scene=new THREE.Scene();this.scene.background=new THREE.Color('#b5c6c6');this.scene.fog=new THREE.FogExp2('#a4b8b8',.012);this.camera=new THREE.PerspectiveCamera(43,1,.05,250);this.yaw=-.43;this.pitch=.04;this.distance=6.6;this.focus=new THREE.Vector3(-22,-10,-18);this.camera.position.set(95,75,440);this.ray=new THREE.Raycaster();this.pointer=new THREE.Vector2();this.pickables=[];this.elapsed=0;this.markers=[];this.particles=[];this.limbMesh=[];
- this.scene.add(new THREE.HemisphereLight('#c4d6e5','#424d53',1.6));this.sun=new THREE.DirectionalLight('#fff0d5',2.9);this.sun.position.set(-8,18,12);this.sun.castShadow=true;this.sun.shadow.mapSize.set(2048,2048);Object.assign(this.sun.shadow.camera,{left:-9,right:9,top:12,bottom:-10,near:1,far:48});this.sun.shadow.bias=-.00025;this.sun.shadow.normalBias=.012;this.scene.add(this.sun);this.scene.add(this.sun.target);let rim=new THREE.DirectionalLight('#9ec5dd',.7);rim.position.set(8,7,-5);this.scene.add(rim);
- this.assetTasks=[];this.buildTerrain();this.buildWorld();this.ready=Promise.all(this.assetTasks);this.buildClimber();this.buildHelpers();this.resize();
+ this.scene.add(new THREE.HemisphereLight('#c4d6e5','#424d53',1.6));this.sun=new THREE.DirectionalLight('#fff0d5',2.9);this.sun.position.set(-8,18,12);this.sun.castShadow=true;let shadowSize=matchMedia("(pointer:coarse)").matches?1024:2048;this.sun.shadow.mapSize.set(shadowSize,shadowSize);Object.assign(this.sun.shadow.camera,{left:-9,right:9,top:12,bottom:-10,near:1,far:48});this.sun.shadow.bias=-.00025;this.sun.shadow.normalBias=.012;this.scene.add(this.sun);this.scene.add(this.sun.target);let rim=new THREE.DirectionalLight('#9ec5dd',.7);rim.position.set(8,7,-5);this.scene.add(rim);
+ this.assetTasks=[];this.buildTerrain();this.buildWorld();this.texturesReady=Promise.allSettled(this.assetTasks);this.ready=Promise.resolve();this.buildClimber();this.buildHelpers();this.resize();
  }
  material(color,roughness=.85){return new THREE.MeshStandardMaterial({color,roughness});}
  buildTerrain(){terrainV3(this);}

@@ -1,8 +1,17 @@
-import * as T from './vendor/three.module.min.js?v=09a';
-import {wallZ,clamp} from './physics.js?v=09a';
-import {bounds,faceZ,strata,alpineHeight,noise,fbm,hash} from './geology.js?v=09a';
-function texture(owner,url,color=false){let resolve,reject;owner.assetTasks.push(new Promise((r,j)=>{resolve=r;reject=j;}));let t=new T.TextureLoader().load(url,resolve,undefined,reject);t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=Math.min(8,owner.renderer.capabilities.getMaxAnisotropy());if(color)t.colorSpace=T.SRGBColorSpace;return t;}
-export function makeRockMaterial(owner){if(owner.rockMat)return owner.rockMat;let map=texture(owner,'./assets/rock/color.jpg',true),normal=texture(owner,'./assets/rock/normal.jpg'),rough=texture(owner,'./assets/rock/roughness.jpg');let m=new T.MeshStandardMaterial({map,normalMap:normal,normalScale:new T.Vector2(.65,.65),roughnessMap:rough,roughness:.94,vertexColors:true});m.onBeforeCompile=s=>{s.vertexShader='varying vec3 rockPosition;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nrockPosition=position;');s.fragmentShader='varying vec3 rockPosition;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
+import * as T from './vendor/three.module.min.js?v=10a';
+import {wallZ,clamp} from './physics.js?v=10a';
+import {bounds,faceZ,strata,alpineHeight,noise,fbm,hash} from './geology.js?v=10a';
+function texture(owner,url,color=false){
+ // A valid local texture exists before any network request: optional detail never gates play.
+ let c=document.createElement('canvas');c.width=c.height=64;let ctx=c.getContext('2d'),data=ctx.createImageData(64,64),normal=url.includes('normal'),rough=url.includes('roughness');
+ for(let i=0;i<4096;i++){let n=rough?235:Math.round(110+18*Math.sin(i*1.73)+9*Math.sin(Math.floor(i/64)*.6));data.data.set(normal?[128,128,255,255]:[n,n,n,255],i*4);}ctx.putImageData(data,0,0);
+ let t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=Math.min(4,owner.renderer.capabilities.getMaxAnisotropy());if(color)t.colorSpace=T.SRGBColorSpace;
+ if(new URLSearchParams(location.search).get('lite')==='1')return t;
+ owner.textureStatus??=[];
+ owner.assetTasks.push(new Promise(resolve=>{new T.ImageLoader().load(url,img=>{t.dispose();t.image=img;t.needsUpdate=true;owner.textureStatus.push('loaded');resolve(true);},undefined,()=>{owner.textureStatus.push('fallback');resolve(false);});}));
+ return t;
+}
+export function makeRockMaterial(owner){if(owner.rockMat)return owner.rockMat;let map=texture(owner,'./assets/rock/color-mobile.webp',true),normal=texture(owner,'./assets/rock/normal-mobile.webp'),rough=texture(owner,'./assets/rock/roughness-mobile.webp');let m=new T.MeshStandardMaterial({map,normalMap:normal,normalScale:new T.Vector2(.65,.65),roughnessMap:rough,roughness:.94,vertexColors:true});m.onBeforeCompile=s=>{s.vertexShader='varying vec3 rockPosition;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nrockPosition=position;');s.fragmentShader='varying vec3 rockPosition;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
 vec4 broadRock=texture2D(map,vMapUv*.061+vec2(.17,.31));float rockLOD=smoothstep(18.,100.,distance(cameraPosition,rockPosition));diffuseColor.rgb=mix(diffuseColor.rgb,broadRock.rgb,rockLOD*.88);
 `);s.fragmentShader=s.fragmentShader.replace('#include <normal_fragment_maps>',T.ShaderChunk.normal_fragment_maps.replace('mapN.xy *= normalScale;','mapN.xy *= normalScale * (1.0-smoothstep(18.,100.,distance(cameraPosition,rockPosition))*.95);'));s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
 float gray=dot(diffuseColor.rgb,vec3(.2126,.7152,.0722));diffuseColor.rgb=mix(vec3(gray),diffuseColor.rgb,.12)*1.70;
