@@ -1,0 +1,11 @@
+Rock Face 01 scanned mesh and textures: Poly Haven, CC0.
+https://polyhaven.com/a/rock_face_01
+Rock Face PBR textures: Poly Haven, CC0.
+https://polyhaven.com/a/rock_face
+https://polyhaven.com/license
+Original procedural mountain layout, climbing surface, character and gameplay.
+No Cairn assets or audio included.
+
+v0.4 uses the Rock Face PBR textures on original continuous geometry.
+The retained scan files are not loaded by v0.4. Character, fabric textures,
+mountain geometry and environment shaders are original procedural assets.
