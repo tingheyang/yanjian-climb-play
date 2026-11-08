@@ -1,9 +1,9 @@
-import {contactAt,proposeMove,commitMove,shiftBody,clamp,distance,wallZ,support,holds,snapshot} from './physics.js?v=17a';
+import {contactAt,proposeMove,commitMove,shiftBody,clamp,distance,wallZ,support,holds,snapshot} from './physics.js?v=18a';
 // The joystick changes role only when a limb is explicitly released.
 export class ClimbControls{
  constructor(){this.target=null;this.candidate=null;this.result=null;this.history=[];this.direction={x:0,y:1};this.lastLimb=-1;}
  reset(){this.history=[];this.lastLimb=-1;this.direction={x:0,y:1};}
- choose(s){let loads=support(s).loads,best=-Infinity,limb=s.selected;for(let i=0;i<4;i++){let origin=s.contacts[i];for(let h of holds){let dx=h.x-origin.x,dy=h.y-origin.y,d=Math.hypot(dx,dy),progress=dx*this.direction.x+dy*this.direction.y;if(d<.15||d>.95||progress<.12)continue;let r=proposeMove(s,i,h);if(!r.ok)continue;let score=progress*.7+h.q*.25-loads[i]*.5+(r.pelvis.y-s.pelvis.y)*2-(i===this.lastLimb?.25:0);if(score>best){best=score;limb=i;}}}return limb;}
+ choose(s){let loads=support(s).loads,best=-Infinity,limb=s.selected;for(let i=0;i<4;i++){let origin=s.contacts[i];for(let h of holds){let dx=h.x-origin.x,dy=h.y-origin.y,d=Math.hypot(dx,dy),progress=dx*this.direction.x+dy*this.direction.y;if(d<.15||d>.95||progress<.12)continue;let r=proposeMove(s,i,h);if(!r.ok)continue;let partner=s.contacts[i%2?i-1:i+1],crossing=i%2?h.x<partner.x-.08:h.x>partner.x+.08,detached=support({...s,active:i}),remainingHand=i<2?1-i:-1,risk=remainingHand>=0?detached.loads[remainingHand]*(1-s.energy[remainingHand]/100):detached.handShare*(1-Math.min(...s.energy.slice(0,2))/100);let score=progress*.7+h.q*.25-loads[i]*.5+(r.pelvis.y-s.pelvis.y)*2-(i===this.lastLimb?.25:0)-(crossing?.65:0)-risk*.8;if(score>best){best=score;limb=i;}}}return limb;}
  primary(s){if(!this.moving){this.select(s,this.choose(s));this.release(s);return {ok:true,released:true};}let before=snapshot(s),r=this.grip(s);if(r.ok&&!r.returned){this.history.push(before);if(this.history.length>8)this.history.shift();this.lastLimb=r.limb;}return r;}
  undo(s){if(this.moving){this.cancel(s);return true;}let previous=this.history.pop();if(!previous)return false;s.pelvis=previous.pelvis;s.contacts=previous.contacts;s.active=-1;s.resting=false;this.lastLimb=-1;return true;}
  get moving(){return this.target!==null;}

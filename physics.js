@@ -1,5 +1,5 @@
-import {routeCenter,restStance} from './route.js?v=17a';
-import {rockHeight} from './height-data.js?v=17a';
+import {routeCenter,restStance} from './route.js?v=18a';
+import {rockHeight} from './height-data.js?v=18a';
 // Deterministic reduced-order climbing model. Units are metres, seconds and body-weight fractions.
 // This is an original quasi-static approximation, not a biomechanical validation or Cairn's solver.
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {holdFeedback,joystickVector,fatigueMotion,restPose} from '../experience.js';
+import {initialState,support} from '../physics.js';
+import {saveProgress,loadProgress,clearProgress} from '../progress.js';
+assert(!holdFeedback(true,true,.38).stable);assert.notEqual(holdFeedback(true,true,.38).color,holdFeedback(true,true,.96).color);assert(!holdFeedback(false,true,1).stable);
+assert.deepEqual(joystickVector(2,1,40),{x:0,y:0});assert(joystickVector(20,0,40).x<.5);assert.equal(joystickVector(80,0,40).x,1);
+assert(fatigueMotion(10,.7,false)>0);assert.equal(fatigueMotion(90,.7,false),0);assert.equal(fatigueMotion(10,.7,true),0);
+let s=initialState(),contacts=JSON.stringify(s.contacts),p=restPose(s);assert.equal(JSON.stringify(s.contacts),contacts);assert(support({...s,pelvis:p}).footShare>=support(s).footShare);
+let data=null,storage={setItem:(k,v)=>data=v,getItem:()=>data,removeItem:()=>data=null};s.phase='climbing';s.moves=3;assert(saveProgress(storage,s));assert.deepEqual(loadProgress(storage).contacts,s.contacts);s.active=2;assert(!saveProgress(storage,s));data='{"version":1}';assert.equal(loadProgress(storage),null);s.active=-1;saveProgress(storage,s);let corrupt=JSON.parse(data);corrupt.energy=[100];data=JSON.stringify(corrupt);assert.equal(loadProgress(storage),null);assert(!saveProgress(undefined,s));clearProgress(storage);assert.equal(loadProgress(storage),null);
+console.log('PASS: slippery hold feedback, fine joystick, limb fatigue, contact-preserving rest and safe progress recovery');
