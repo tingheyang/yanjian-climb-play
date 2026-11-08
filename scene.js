@@ -1,7 +1,7 @@
-import {buildCharacter} from './character.js?v=13a';
-import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=13a';
-import * as THREE from './vendor/three.module.min.js?v=13a';
-import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=13a';
+import {buildCharacter} from './character.js?v=14a';
+import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=14a';
+import * as THREE from './vendor/three.module.min.js?v=14a';
+import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=14a';
 const V=p=>new THREE.Vector3(p.x,p.y,p.z), Y=new THREE.Vector3(0,1,0);
 function rng(seed=81){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};}
 export class ClimbScene{
@@ -30,10 +30,10 @@ export class ClimbScene{
  let a=V(p).add(new THREE.Vector3(0,.15,.04));let arr=this.loadLines[i].geometry.attributes.position;arr.setXYZ(0,a.x,a.y,a.z);arr.setXYZ(1,end.x,end.y,end.z+.04);arr.needsUpdate=true;this.loadLines[i].computeLineDistances();this.loadLines[i].material.opacity=forces.loads[i]*.8+.10;}
  this.comMarker.position.copy(p).add(new THREE.Vector3(0,.16,.16));let check=state.checkpoint;let anchor=new THREE.Vector3(check.pelvis.x,check.pelvis.y-.10,wallZ(check.pelvis.x,check.pelvis.y-.10)+.12);this.piton.position.copy(anchor);if(this.rope){this.rope.geometry.dispose();this.scene.remove(this.rope);}let waist=p.clone().add(new THREE.Vector3(0,0,.12)),sag=Math.min(.55,anchor.distanceTo(waist)*.17+.15),middle=anchor.clone().add(waist).multiplyScalar(.5).add(new THREE.Vector3(.08,-sag,.12));let curve=new THREE.QuadraticBezierCurve3(anchor,middle,waist);this.rope=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.009,5,false),this.ropeMaterial);this.scene.add(this.rope);
  }
- setPreview(p,ok){this.preview=p;this.cursor.visible=!!p;if(p){this.cursor.position.copy(V(p)).add(new THREE.Vector3(0,0,.08));this.cursor.material.color.set(ok?'#b8dfb5':'#e98466');}}
+ setPreview(p,ok,snapped=true){this.preview=p;this.cursor.visible=!!p;if(p){this.cursor.position.copy(V(p)).add(new THREE.Vector3(0,0,.08));this.cursor.material.color.set(ok?(snapped?'#b8dfb5':'#e3c38b'):'#e98466');}}
  update(state,dt,forces,options){this.elapsed+=dt;if(this.guide.visible)this.guide.scale.setScalar(1+Math.sin(this.elapsed*3)*.1);this.updateCharacter(state,dt,forces);this.helperGroup.visible=options.assist;this.comMarker.visible=options.forces;this.loadLines.forEach(m=>m.visible=options.forces);this.holdDots.children.forEach(m=>{m.visible=options.assist&&Math.abs(m.position.y-state.pelvis.y)<1.65&&distance(m.position,roots(state.pelvis)[state.selected])<.98;});
  let p=this.visualPelvis,panorama=options.overview,inspect=options.inspect,look=options.look,aspect=this.camera.aspect;
- let target=panorama?new THREE.Vector3(-52,-12,-24):new THREE.Vector3(p.x+(inspect?.12:aspect<.7?.48:1.3),p.y+(inspect?.40:.64),p.z-.1);
+ let target=panorama?new THREE.Vector3(-52,-12,-24):new THREE.Vector3(p.x+(inspect?.12:aspect<1.35?.35:1.3),p.y+(inspect?.40:.64),p.z-.1);
  if(look)target=new THREE.Vector3(p.x+(look==='up'?1:12),p.y+(look==='up'?25:-100),look==='up'?-3:-24);let speed=panorama?.85:2.2;this.focus.lerp(target,1-Math.exp(-dt*speed));
  let dist=panorama?(aspect<.7?690:540):inspect?3.4:this.distance*(aspect<.7?1.2:1);
  let yaw=panorama?-.22:this.yaw,pitch=panorama?.12:inspect?.08:this.pitch;

@@ -1,4 +1,4 @@
-import {wallZ,clamp} from './physics.js?v=13a';
+import {wallZ,clamp} from './physics.js?v=14a';
 export const hash=(x,y)=>{let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n);};
 export function noise(x,y){let a=Math.floor(x),b=Math.floor(y),u=x-a,v=y-b;u=u*u*(3-2*u);v=v*v*(3-2*v);return (hash(a,b)*(1-u)+hash(a+1,b)*u)*(1-v)+(hash(a,b+1)*(1-u)+hash(a+1,b+1)*u)*v;}
 export function fbm(x,y,n=5){let s=0,a=.5;for(let i=0;i<n;i++){s+=a*noise(x,y);x=x*2.03+13.7;y=y*2.03+9.2;a*=.5;}return s;}
