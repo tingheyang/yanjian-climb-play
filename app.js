@@ -1,16 +1,16 @@
-import {holdFeedback,joystickVector,restPose} from './experience.js?v=18a';
-import {saveProgress,loadProgress,clearProgress} from './progress.js?v=18a';
+import {holdFeedback,joystickVector,restPose} from './experience.js?v=19a';
+import {saveProgress,loadProgress,clearProgress} from './progress.js?v=19a';
 let progressStorage;try{progressStorage=window.localStorage;}catch{}
 let savedClimb=loadProgress(progressStorage),lastSave=0;
-import {routeStage,atRestStance} from './route.js?v=18a';
-import {ClimbCoach} from './guidance.js?v=18a';
-import {HoldInput} from './hold-input.js?v=18a';
-import {MountainMusic} from './music.js?v=18a';
-import {ClimberBreath,breathDemand} from './breath.js?v=18a';
-import {LimbGesture} from './limb-gesture.js?v=18a';
-import {ClimbControls} from './controls.js?v=18a';
-import {ClimbScene} from './scene.js?v=18a';
-import {initialState,holds,support,tick,contactAt,proposeMove,commitMove,shiftBody,snapshot,restore,wallZ,clamp,distance,roots,v} from './physics.js?v=18a';
+import {routeStage,atRestStance} from './route.js?v=19a';
+import {ClimbCoach} from './guidance.js?v=19a';
+import {HoldInput} from './hold-input.js?v=19a';
+import {MountainMusic} from './music.js?v=19a';
+import {ClimberBreath,breathDemand} from './breath.js?v=19a';
+import {LimbGesture} from './limb-gesture.js?v=19a';
+import {ClimbControls} from './controls.js?v=19a';
+import {ClimbScene} from './scene.js?v=19a';
+import {initialState,holds,support,tick,contactAt,proposeMove,commitMove,shiftBody,snapshot,restore,wallZ,clamp,distance,roots,v} from './physics.js?v=19a';
 const $=s=>document.querySelector(s),names=['左手','右手','左脚','右脚'];
 const guideSteps=[{limb:3,id:15,label:'① 右脚目标'},{limb:2,id:8,label:'② 左脚目标'},{limb:1,id:39,label:'③ 右手目标'}];let guideStep=0;const control=new ClimbControls();const holdInput=new HoldInput();let manualNext=false;const coach=new ClimbCoach();
 let state=initialState(),scene,paused=false,view=false,assist=false,forceView=false,overview=false,inspect=false,look=null,drag=null,joy={x:0,y:0},joyPointer=null,pointers=new Map(),last=0,lastUI=0,moveStart=null,mute=false,started=false,breathTime=0,breathing,music,musicEnabled=true,musicVolume=.8,ac,master,noiseBuffer,wind,frameTime=0,frameCount=0,fps=0;

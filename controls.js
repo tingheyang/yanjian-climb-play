@@ -1,4 +1,4 @@
-import {contactAt,proposeMove,commitMove,shiftBody,clamp,distance,wallZ,support,holds,snapshot} from './physics.js?v=18a';
+import {contactAt,proposeMove,commitMove,shiftBody,clamp,distance,wallZ,support,holds,snapshot} from './physics.js?v=19a';
 // The joystick changes role only when a limb is explicitly released.
 export class ClimbControls{
  constructor(){this.target=null;this.candidate=null;this.result=null;this.history=[];this.direction={x:0,y:1};this.lastLimb=-1;}

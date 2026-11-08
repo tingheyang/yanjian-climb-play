@@ -1,7 +1,7 @@
-import * as T from './vendor/three.module.min.js?v=18a';
-import {wallZ,clamp,holds} from './physics.js?v=18a';
-import {restStance} from './route.js?v=18a';
-import {bounds,faceZ,strata,alpineHeight,noise,fbm,hash} from './geology.js?v=18a';
+import * as T from './vendor/three.module.min.js?v=19a';
+import {wallZ,clamp,holds} from './physics.js?v=19a';
+import {restStance} from './route.js?v=19a';
+import {bounds,faceZ,strata,alpineHeight,noise,fbm,hash} from './geology.js?v=19a';
 function texture(owner,url,color=false){
  // A valid local texture exists before any network request: optional detail never gates play.
  let c=document.createElement('canvas');c.width=c.height=64;let ctx=c.getContext('2d'),data=ctx.createImageData(64,64),normal=url.includes('normal'),rough=url.includes('roughness');

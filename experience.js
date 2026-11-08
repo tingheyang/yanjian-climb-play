@@ -1,4 +1,4 @@
-import {clamp,support,solvePelvis,roots,distance,lengths,wallZ} from './physics.js?v=18a';
+import {clamp,support,solvePelvis,roots,distance,lengths,wallZ} from './physics.js?v=19a';
 export function holdFeedback(valid,snapped,q=0){if(!valid)return {text:'够不到',color:'#e98466',stable:false};if(!snapped)return {text:'摩擦面 · 易疲劳',color:'#e3c38b',stable:false};if(q<.5)return {text:'碎岩 · 小心承重',color:'#e3a477',stable:false};return {text:q>.85?'稳固岩点':'小岩沿',color:q>.85?'#b8dfb5':'#d4d6a2',stable:q>.85};}
 export function joystickVector(x,y,r){let n=Math.hypot(x,y)/r;if(n<.13)return {x:0,y:0};let magnitude=Math.pow(clamp((n-.13)/.87,0,1),1.45);return {x:x/Math.hypot(x,y)*magnitude,y:-y/Math.hypot(x,y)*magnitude};}
 export function fatigueMotion(energy,load,active){return active?0:clamp((45-energy)/45,0,1)*clamp(load*3,0,1);}

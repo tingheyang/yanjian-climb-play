@@ -1,5 +1,6 @@
-import {routeCenter,restStance} from './route.js?v=18a';
-import {rockHeight} from './height-data.js?v=18a';
+import {holdLayout,rockRecess} from './hold-layout.js?v=19a';
+import {routeCenter,restStance} from './route.js?v=19a';
+import {rockHeight} from './height-data.js?v=19a';
 // Deterministic reduced-order climbing model. Units are metres, seconds and body-weight fractions.
 // This is an original quasi-static approximation, not a biomechanical validation or Cairn's solver.
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -13,9 +14,9 @@ export const norm=a=>mul(a,1/(len(a)||1));
 export const mix=(a,b,t)=>add(a,mul(sub(b,a),t));
 export const cross=(a,b)=>v(a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x);
 export const distance=(a,b)=>len(sub(a,b));
-export function wallZ(x,y){return .14*Math.sin(x*1.7+y*.24)+.09*Math.cos(y*2.8+x*.7)+.075*Math.sin(x*4.6+y*1.3)+.42*Math.exp(-(((y-10.5)/1.8)**2))+.11*Math.sin(y*.7)+.13*(rockHeight(x,y)-.5);}
+export function wallZ(x,y){return .14*Math.sin(x*1.7+y*.24)+.09*Math.cos(y*2.8+x*.7)+.075*Math.sin(x*4.6+y*1.3)+.42*Math.exp(-(((y-10.5)/1.8)**2))+.11*Math.sin(y*.7)+.13*(rockHeight(x,y)-.5)+rockRecess(x,y);}
 export function surfaceNormal(x,y){let e=.015;return norm(v(-(wallZ(x+e,y)-wallZ(x-e,y))/(2*e),-(wallZ(x,y+e)-wallZ(x,y-e))/(2*e),1));}
-export function makeHolds(){let a=[];for(let r=0;r<=40;r++){let y=r*.43+.10;for(let c=0;c<6;c++){let x=(c-2.5)*.61+Math.sin(r*1.71+c*2.2)*.14;let yy=y+Math.sin(c*3.4+r*.9)*(r===0||r===4?.08:.19);let q=.65+.3*(.5+.5*Math.sin(r*7.7+c*9.1));if((r+c*3)%9===0)q=.4;if(r<5&&(c===2||c===3))q=.95;if(r>=5&&r<=16){x+=routeCenter(yy)*Math.max(0,1-Math.abs(c-2.5)*.23);q=(c===2||c===3)?.96:.38;}if(r===13&&(c===2||c===3)){yy=restStance.y;x=restStance.x+(c===2?-.30:.30);q=1;}a.push({id:a.length,x,y:yy,z:wallZ(x,yy)+.025,q,kind:q<.5?'碎岩':q>.85?'岩台':'裂隙',width:.075+q*.09});}}return a;}
+export function makeHolds(){return holdLayout.map(h=>({...h,z:wallZ(h.x,h.y)+.025}));}
 export const holds=makeHolds();
 export function contactAt(x,y){let p=v(x,y,wallZ(x,y)+.025),nearest=null,dmin=.23;for(let h of holds){let d=Math.hypot(h.x-x,h.y-y);if(d<dmin){nearest=h;dmin=d;}}if(nearest)return {...nearest};let normal=surfaceNormal(x,y);return {...p,q:clamp(.29+normal.y*.45,.16,.48),kind:'摩擦面',id:-1,width:.04};}
 export const jointOffsets=[v(-.205,.49,-.015),v(.205,.49,-.015),v(-.135,-.03,0),v(.135,-.03,0)];
