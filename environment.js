@@ -1,7 +1,7 @@
-import * as T from './vendor/three.module.min.js?v=16a';
-import {wallZ,clamp,holds} from './physics.js?v=16a';
-import {restStance} from './route.js?v=16a';
-import {bounds,faceZ,strata,alpineHeight,noise,fbm,hash} from './geology.js?v=16a';
+import * as T from './vendor/three.module.min.js?v=17a';
+import {wallZ,clamp,holds} from './physics.js?v=17a';
+import {restStance} from './route.js?v=17a';
+import {bounds,faceZ,strata,alpineHeight,noise,fbm,hash} from './geology.js?v=17a';
 function texture(owner,url,color=false){
  // A valid local texture exists before any network request: optional detail never gates play.
  let c=document.createElement('canvas');c.width=c.height=64;let ctx=c.getContext('2d'),data=ctx.createImageData(64,64),normal=url.includes('normal'),rough=url.includes('roughness');
@@ -30,11 +30,14 @@ export function buildTerrain(o){let mat=makeRockMaterial(o);let xs=[];for(let x=
  slab(o,[-.5,-.54,-.85],[2.1,.27,1.1],102,mat);slab(o,[.1,17.45,-.75],[2.25,.22,.95],108,mat);
  // A small cairn at the stance provides a familiar scale cue.
  for(let i=0;i<4;i++)slab(o,[-1.45,-.12+i*.105,.1],[.17-i*.025,.055,.11],i+91,mat);
- // Contact coordinates are the top-front edge of each ledge, shared with physics.
+ // Sparse broken seams follow the local rock surface instead of repeating projecting blocks.
  let hp=[],hu=[],hc=[],hi=[];
- for(let h of holds){let w=h.width*(h.q>.85?1.55:1),depth=.11+h.q*.08,base=hp.length/3;
- let vertices=[[-w,0,0],[w*.82,0,0],[w,-.07,-.025],[-w*.7,-.11,-.035],[-w*.85,0,-depth],[w*.7,0,-depth],[w*.8,-.11,-depth],[-w,-.14,-depth]];
- for(let [x,y,z]of vertices){x+=h.x;y+=h.y;z+=h.z;hp.push(x,y,z);hu.push(x/3.7,y/3.7);hc.push(...colorAt(x,y,z));}
+ const exposed=new Set([15,39,62,80,81,116,153,201]);
+ for(let h of holds){let prominent=exposed.has(h.id);
+ if(!prominent&&(h.q<.85||hash(h.id,419)<.58))continue;
+ let w=h.width*(prominent?1.15:1.7+hash(h.id,21)),height=prominent?.035:.009,base=hp.length/3;
+ let vertices=[[-w,0,0],[w*.82,0,0],[w,-height,-.012],[-w*.7,-height*1.35,-.018],[-w*.85,.025,-.07],[w*.7,.025,-.07],[w*.8,-height*1.8,-.07],[-w,-height*1.8,-.07]];
+ for(let [dx,dy,dz]of vertices){let x=h.x+dx,y=h.y+dy-dx*.10,z=wallZ(x,y)+(prominent?.025:.008)+dz;hp.push(x,y,z);hu.push(x/3.7,y/3.7);hc.push(...colorAt(x,y,z));}
  for(let k of [0,1,2,0,2,3,0,4,5,0,5,1,3,2,6,3,6,7,0,3,7,0,7,4,1,5,6,1,6,2])hi.push(base+k);
  }
  for(let i=0;i<hi.length;i+=3)[hi[i+1],hi[i+2]]=[hi[i+2],hi[i+1]];
