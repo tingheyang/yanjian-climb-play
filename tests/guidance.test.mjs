@@ -1,3 +1,5 @@
 import assert from 'node:assert/strict';
 import {ClimbCoach} from '../guidance.js';
 let c=new ClimbCoach();assert(c.update(0).text.includes('按住'));assert.equal(c.update(9),null);assert(c.update(0,{holding:true,limb:'右脚'}).text.includes('右脚'));assert(c.update(0,{holding:true,moving:true,snapped:true}).text.includes('松开'));c.placed();assert(c.update(0).text.includes('轻点'));c.placed();assert(c.update(0).text.includes('重心'));c.placed();assert.equal(c.update(0,{holding:true}),null);c.reset();c.dismiss();assert.equal(c.update(1),null);assert(c.update(0,{energy:20}).warning);assert.equal(c.update(1,{energy:20}),null);assert(c.update(25,{energy:20}).warning);assert.equal(c.update(25,{energy:20,resting:true}),null);console.log('PASS: onboarding timeout, contextual instruction, completion, dismiss, fatigue cooldown');
+
+c.reset();assert(c.update(0,{energy:50,footShare:.7}).text.includes('双脚已站稳'));c.reset();assert(!c.update(0,{energy:50,footShare:.3}).warning);
