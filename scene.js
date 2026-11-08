@@ -1,7 +1,7 @@
-import {buildCharacter} from './character.js?v=12a';
-import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=12a';
-import * as THREE from './vendor/three.module.min.js?v=12a';
-import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=12a';
+import {buildCharacter} from './character.js?v=13a';
+import {buildTerrain as terrainV3,buildWorld as worldV3} from './environment.js?v=13a';
+import * as THREE from './vendor/three.module.min.js?v=13a';
+import {holds,wallZ,surfaceNormal,roots,jointIK,lengths,v,add,sub,mul,distance,clamp} from './physics.js?v=13a';
 const V=p=>new THREE.Vector3(p.x,p.y,p.z), Y=new THREE.Vector3(0,1,0);
 function rng(seed=81){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};}
 export class ClimbScene{
@@ -42,13 +42,13 @@ export class ClimbScene{
  this.sun.position.set(p.x-8,p.y+12,12);this.sun.target.position.set(p.x,p.y,0);this.sun.target.updateMatrixWorld();
  this.clouds.forEach((m,i)=>m.position.x+=dt*(.09+i*.002));this.birds?.forEach((b,i)=>{b.position.x=20+i*16+Math.sin(this.elapsed*.12+i)*20;b.position.y=-12-i*9+Math.sin(this.elapsed*.23+i)*2;b.rotation.z=Math.sin(this.elapsed*.4+i)*.12;});
  if(this.head)this.head.rotation.y=Math.sin(this.elapsed*.27)*.18+(state.selected===1?-.12:.08);
- this.helperGroup.visible=!panorama&&!inspect&&!look;this.markers.forEach((m,i)=>{let chosen=options.pickHover>=0?options.pickHover:state.selected;m.visible=options.assist||i===chosen;m.scale.setScalar(i===chosen?1.65:1);m.material.opacity=i===chosen?.95:.35;});this.holdDots.visible=!panorama&&!inspect&&!look;this.guide.visible=this.guide.visible&&!panorama;
+ this.helperGroup.visible=!panorama&&!inspect&&!look;this.markers.forEach((m,i)=>{let chosen=options.pickHover>=0?options.pickHover:state.selected;m.visible=options.assist||i===chosen||this.elapsed<(this.selectionUntil||0);m.scale.setScalar(i===chosen?1.65:1);m.material.opacity=i===chosen?.95:.35;});this.holdDots.visible=!panorama&&!inspect&&!look;this.guide.visible=this.guide.visible&&!panorama;
  this.renderer.render(this.scene,this.camera);
  }
  resize(){let w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();}
  hit(clientX,clientY){let b=this.canvas.getBoundingClientRect();this.pointer.set((clientX-b.left)/b.width*2-1,-(clientY-b.top)/b.height*2+1);this.ray.setFromCamera(this.pointer,this.camera);let hits=this.ray.intersectObjects(this.pickables,false);return hits.length?hits[0]:null;}
  project(p){let q=V(p).project(this.camera),b=this.canvas.getBoundingClientRect();return {x:(q.x+1)/2*b.width+b.left,y:(1-q.y)/2*b.height+b.top,visible:q.z<1};}
- nearestLimb(x,y,s){let result=-1,best=32;for(let i=0;i<4;i++){let p=this.project(s.contacts[i]),d=Math.hypot(p.x-x,p.y-y);if(d<best){best=d;result=i;}}return result;}
+ nearestLimb(x,y,s){let result=-1,best=38;for(let i=0;i<4;i++){let p=this.project(this.visualContacts?.[i]||s.contacts[i]),d=Math.hypot(p.x-x,p.y-y);if(p.visible&&d<best){best=d;result=i;}}return result;}
  orbit(dx,dy){this.yaw=clamp(this.yaw-dx*.005,-.95,.95);this.pitch=clamp(this.pitch+dy*.004,-.30,.6);}
  resetCamera(){this.yaw=-.43;this.pitch=.04;this.distance=6.6;}
 }
